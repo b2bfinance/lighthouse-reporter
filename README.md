@@ -2,16 +2,22 @@
 
 Report whole site metrics using Lighthouse by Google.
 
+## Install
+
+```bash
+$ go get -v github.com/b2bfinance/lighthouse-reporter/cmd/lhreporter
+```
+
 ## Usage
 
 ```bash
-$ lighthouse-reporter configuration.json
+$ lhreport configuration.json
 ```
 
 Give the output a reference, this will be the file name in Google Cloud Bucket and on other storage just in the file it self.
 
 ```bash
-$ lighthouse-reporter configuration.json mySiteResults
+$ lhreport configuration.json mySiteResults
 ```
 
 ## Storing the scores

@@ -21,12 +21,12 @@ func main() {
 	ctx := context.Background()
 
 	if len(os.Args) < 2 {
-		log.Fatalln("Usage: lighthouse-reporter <config.json> [reference]")
+		log.Fatalln("Usage: lhreporter <config.json> [reference]")
 	}
 
 	c, err := loadFromFile(os.Args[1])
 	if err != nil {
-		log.Fatalf("Usage: lighthouse-reporter <config.json>\nError: %s\n", err)
+		log.Fatalf("Usage: lhreporter <config.json>\nError: %s\n", err)
 	}
 
 	var reference string
