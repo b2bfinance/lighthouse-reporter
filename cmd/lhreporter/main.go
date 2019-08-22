@@ -24,10 +24,7 @@ func main() {
 		log.Fatalln("Usage: lhreporter <config.json> [reference]")
 	}
 
-	c, err := loadFromFile(os.Args[1])
-	if err != nil {
-		log.Fatalf("Usage: lhreporter <config.json>\nError: %s\n", err)
-	}
+	c := getConfiguration(ctx)
 
 	var reference string
 	if len(os.Args) > 2 {

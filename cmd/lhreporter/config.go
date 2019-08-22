@@ -1,10 +1,18 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
+	"net/http"
+	"net/url"
+	"os"
 	"strings"
+	"time"
+
+	"cloud.google.com/go/storage"
 )
 
 type (
@@ -27,7 +35,82 @@ type (
 	}
 )
 
-func loadFromFile(fn string) (*appConfig, error) {
+func getConfiguration(ctx context.Context) *appConfig {
+	ctx, cancel := context.WithTimeout(ctx, 15*time.Second)
+	defer cancel()
+
+	c, err := loadConfiguration(ctx, os.Args[1])
+
+	if err != nil {
+		log.Fatalf("Usage: lhreporter <config.json>\nError: %s\n", err)
+	}
+
+	return c
+}
+
+func loadConfiguration(ctx context.Context, loc string) (*appConfig, error) {
+	if strings.HasPrefix(loc, "gs://") {
+		return loadConfigurationFromBucket(ctx, loc)
+	}
+
+	if strings.HasPrefix(loc, "http") {
+		return loadConfigurationFromHTTP(ctx, loc)
+	}
+
+	return loadConfigurationFromFile(loc)
+}
+
+func loadConfigurationFromBucket(ctx context.Context, loc string) (*appConfig, error) {
+	u, err := url.Parse(loc)
+	if err != nil {
+		return nil, err
+	}
+
+	c, err := storage.NewClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	b := c.Bucket(u.Host)
+	r, err := b.Object(u.Path).NewReader(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer r.Close()
+
+	rb, err := ioutil.ReadAll(r)
+
+	if err != nil {
+		return nil, err
+	}
+
+	conf := &appConfig{}
+	return conf, json.Unmarshal(rb, conf)
+}
+
+func loadConfigurationFromHTTP(ctx context.Context, loc string) (*appConfig, error) {
+	req, err := http.NewRequest("GET", loc, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := http.DefaultClient.Do(req.WithContext(ctx))
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	rb, err := ioutil.ReadAll(res.Body)
+
+	if err != nil {
+		return nil, err
+	}
+
+	conf := &appConfig{}
+	return conf, json.Unmarshal(rb, conf)
+}
+
+func loadConfigurationFromFile(fn string) (*appConfig, error) {
 	rb, err := ioutil.ReadFile(fn)
 
 	if err != nil {

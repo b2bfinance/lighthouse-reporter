@@ -1,0 +1,40 @@
+language: go
+
+# Force-enable Go modules. Also force go to use the code in vendor/
+# These will both be unnecessary when Go 1.13 lands.
+env:
+  - GO111MODULE=on
+  - GOFLAGS='-mod vendor'
+
+go:
+  - 1.12.x
+
+git:
+  depth: 1
+
+install: true
+
+notifications:
+  email: false
+
+before_script:
+  - go install github.com/golangci/golangci-lint/cmd/golangci-lint
+  - go get github.com/mitchellh/gox
+
+script:
+  - golangci-lint run
+  - go test -v -race ./...
+  - gox -os="linux darwin windows" -arch="amd64" -output="lhreporter.." -verbose ./cmd/lhreporter
+
+deploy:
+  provider: releases
+  skip_cleanup: true
+  api_key:
+    secure: VVB8c3qmxcyi9LmiJd2J7yWXRQMBdBeqFxKr4t4UWllvzhxXHWLLVmTFFLZktlpXPk41C11T0my7rOe6ceGYWySFngczoxt6Drz8Rsa9aDjTxsGqyTPxzmEq3jtgAgzjICs2M3Nzgw7vJmp4hE33NteHTUrr0Ia9isKw1iCh4KbCOrktcBH6SUyksDYjqo0jO9xQrH5Bf6FPgL2LHyNpKx1NrGyc1Z2swYqs9QfFpnKvLnSrYim4TIRUt9kP4XebZKdni0wfEoaVs9sCsHaJfZytigbGdo+iHB3BlhleVPwaQtWVGmkNKDT4tcrcLyLHkU8aFt5KEZBQ4bSWFJ9MXi8kwFllPXfd06phl66Jz0f7nT1+jXuocAq51HhMOSw4yJPtOu8wfG084FbY0jh2CTMrl8LQi48lLBkDBdcfKE3AAq4dYhIy0Nj/Ymosg6uBwloIc3f+jQmdFj3UmFkgdacRygwv+K+L7A+Orslu0K4wAPgTfWxm4cistL45dN7MS2p4sS6Bnyt9kC9uxa/UZwYogFqFzydwxPnSb448sz5fbjcWlHtGB6s3IrQzOZ5C5zeWeDtOoQ4HIVDaUgMqjfc2HF3WH/ObbIIGz7KCZYIQiEtJhV2Nr5j46JlDUQzneepN4xJmNV70JXL06iNITwNFgAyuRPvxJGsWOyAqqPo=
+  file:
+  - lhreporter.windows.amd64.exe
+  - lhreporter.darwin.amd64
+  - lhreporter.linux.amd64
+  on:
+    repo: b2bfinance/lighthouse-reporter
+    tags: true
