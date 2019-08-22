@@ -57,7 +57,7 @@ func main() {
 	epoffset := len(remote)
 	results := make(endpointResults, 0, len(endpoints))
 	for _, ep := range endpoints {
-		score, err := getLighthouseScoreForEndpoint(ctx, ep)
+		score, err := getLighthouseScoreForEndpoint(ctx, c.LighthouseArgs, ep)
 		if err != nil {
 			log.Printf("unable to get result for '%s' error: %s", ep, err)
 			continue

@@ -7,8 +7,14 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func getLighthouseScoreForEndpoint(ctx context.Context, endpoint string) (*scoreSet, error) {
-	cmd := exec.CommandContext(ctx, "lighthouse", endpoint, "--quiet", "--output", "json")
+func getLighthouseScoreForEndpoint(ctx context.Context, lhArgs []string, endpoint string) (*scoreSet, error) {
+	args := []string{
+		endpoint,
+		"--quiet",
+		"--output", "json",
+	}
+	args = append(args, lhArgs...)
+	cmd := exec.CommandContext(ctx, "lighthouse", args...)
 
 	rb, err := cmd.Output()
 	if err != nil {

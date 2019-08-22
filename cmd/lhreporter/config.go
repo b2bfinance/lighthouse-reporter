@@ -23,6 +23,7 @@ type (
 		SiteMap          string   `json:"sitemap"`
 		CustomPaths      []string `json:"customPaths"`
 		StoragePath      string   `json:"storagePath"`
+		LighthouseArgs   []string `json:"lighthouseArgs"`
 	}
 )
 

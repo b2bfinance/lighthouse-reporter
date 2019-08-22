@@ -59,6 +59,7 @@ We require a base URL that is known in the configuration as `remote`, this URL w
   "customPaths": [
     "/path-not-in-sitemap"
   ],
-  "storagePath": "gs://logsBucket/sitename"
+  "storagePath": "gs://logsBucket/sitename",
+  "lighthouseArgs": []
 }
 ```

@@ -39,8 +39,13 @@ func outputResultsToBucket(ctx context.Context, reference, loc string, r endpoin
 		return err
 	}
 
+	path := strings.Trim(u.Path, "/")
+	if u.Path != "" {
+		path += "/"
+	} 
+
 	b := c.Bucket(u.Host)
-	w := b.Object(strings.Trim(u.Path, "/") + "/" + reference + ".json").NewWriter(ctx)
+	w := b.Object(path + reference + ".json").NewWriter(ctx)
 
 	rb, _ := json.Marshal(struct {
 		Reference   string          `json:"reference"`
