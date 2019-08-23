@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/tidwall/gjson"
 )
@@ -14,6 +16,11 @@ func getLighthouseScoreForEndpoint(ctx context.Context, lhArgs []string, endpoin
 		"--output", "json",
 	}
 	args = append(args, lhArgs...)
+
+	if v := os.Getenv("LIGHTHOUSE_ARGS"); v != "" {
+		args = append(args, strings.Split(v, " ")...)
+	}
+
 	cmd := exec.CommandContext(ctx, "lighthouse", args...)
 
 	rb, err := cmd.Output()
